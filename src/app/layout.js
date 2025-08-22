@@ -124,7 +124,6 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased absolute`}>
-        <script src="https://animatedicons.co/scripts/embed-animated-icons.js"></script>
         <Loader>
           <Header />
           {children}
