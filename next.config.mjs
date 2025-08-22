@@ -1,11 +1,12 @@
-// next.config.js
+// next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',  // replaces "next export"
+  // ❌ remove "next export" script, use this instead:
+  output: 'export',
   trailingSlash: true,
   images: {
-    unoptimized: true, // required for static export
+    unoptimized: true,
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;   // ✅ for .mjs
