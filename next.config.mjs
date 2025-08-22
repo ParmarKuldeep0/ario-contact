@@ -3,7 +3,7 @@ const nextConfig = {
   output: "export",   // replaces old `next export`
   trailingSlash: true,
   images: {
-    unoptimized: true, // required for static export
+    unoptimized: true,
   },
 };
 

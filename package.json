@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
   "dev": "next dev",
-  "build": "next build && next export",
+  "build": "next build",
   "start": "next start"
-},
+}
+,
   "dependencies": {
     "@tippyjs/react": "^4.2.6",
     "cors": "^2.8.5",
