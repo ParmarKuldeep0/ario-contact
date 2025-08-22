@@ -48,6 +48,7 @@ const ContactSection = () => {
       [id]: value
     }));
   };
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,13 +56,12 @@ const ContactSection = () => {
     setSubmitStatus({ message: '', isError: false });
 
     try {
-      const response = await fetch('https://ario3.bcsads.com/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+
+     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contact`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(formData),
+});
 
       const data = await response.json();
 
