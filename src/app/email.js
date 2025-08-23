@@ -9,7 +9,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NEXT_PUBLIC_API_URL || '*', // better to specify your deployed frontend URL here for security
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // only if you use cookies/session
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
