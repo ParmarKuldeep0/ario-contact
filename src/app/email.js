@@ -9,12 +9,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({
-  origin: process.env.NEXT_PUBLIC_API_URL || '*', // better to specify your deployed frontend URL here for security
+const corsOptions = {
+  origin: process.env.NEXT_PUBLIC_API_URL || '*', // Replace with your frontend URL in production for security
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // only if you use cookies/session
-}));
+  optionsSuccessStatus: 200, // Some legacy browsers expect this instead of 204
+};
+
+app.use(cors(corsOptions));
+
+// Explicitly handle OPTIONS preflight requests for all routes
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
