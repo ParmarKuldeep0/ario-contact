@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const multer = require('multer');
 const path = require('path');
 require('dotenv').config();
-
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,8 +22,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
-const multer = require('multer');
+// Configure multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -40,8 +39,6 @@ const upload = multer({
     }
   }
 });
-
-
 
 // Verify transporter configuration
 transporter.verify(function (error, success) {
@@ -271,9 +268,6 @@ app.get('/api/test-email', async (req, res) => {
   }
 });
 
-
-// Add to your existing server.js file
-
 // Beautiful HTML email template for job applications
 const createJobApplicationTemplate = (name, email, phone, position, experience, message = '') => {
   return `
@@ -301,7 +295,7 @@ const createJobApplicationTemplate = (name, email, phone, position, experience, 
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background: linear-gradient(135deg, #003980 0%, #0066cc 100%);
+            background: linear-gradient(135deg, #003980 极速赛车开奖直播-168极速赛车开奖结果-极速赛车开奖官网开奖记录 0%, #0066cc 100%);
             padding: 30px 20px;
             text-align: center;
             color: white;
@@ -319,7 +313,7 @@ const createJobApplicationTemplate = (name, email, phone, position, experience, 
             border-left: 4px solid #003980;
             padding: 20px;
             margin-bottom: 25px;
-            border-radius: 4px;
+           极速赛车开奖直播-168极速赛车开奖结果-极速赛车开奖官网开奖记录 border-radius: 4px;
         }
         .detail-item {
             margin-bottom: 15px;
@@ -388,7 +382,7 @@ const createJobApplicationTemplate = (name, email, phone, position, experience, 
     </style>
 </head>
 <body>
-    <div class="container">
+    <div极速赛车开奖直播-168极速赛车开奖结果-极速赛车开奖官网开奖记录 class="container">
         <div class="header">
             <h1>📋 New Job Application - Ario Shipping</h1>
         </div>
@@ -490,8 +484,7 @@ app.post('/api/careers/apply', upload.single('resume'), async (req, res) => {
   }
 });
 
-// Add this near the top of your file after the transporter configuration
-
+// Start server
 app.listen(PORT, () => {
   console.log(`Ario Shipping Contact API running on port ${PORT}`);
   console.log(`Health check available at: http://localhost:${PORT}/api/health`);

@@ -57,12 +57,11 @@ const ContactSection = () => {
 
     try {
 
-     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contact`, {
+     const response = await fetch('https://ario-contact-backend.vercel.app/api/contact', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(formData),
 });
-
       const data = await response.json();
 
       if (data.success) {
