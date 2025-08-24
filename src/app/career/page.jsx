@@ -9,28 +9,20 @@ import {
   FaUserTie,
   FaGlobe,
   FaHeart,
-  FaMapMarkerAlt,
-  FaClock,
-  FaSearch,
   FaRocket,
   FaLightbulb,
-  FaBriefcase,
-  FaUsers,
-  FaShippingFast,
   FaFileUpload
 } from 'react-icons/fa';
 
 const Careers = () => {
   const [activeTab, setActiveTab] = useState('why-ario');
- 
-  const [fileName, setFileName] = useState('');
- 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     position: '',
     experience: '',
+    message: '',
     resume: null
   });
   const [formErrors, setFormErrors] = useState({});
@@ -53,6 +45,44 @@ const Careers = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setFormErrors(prev => ({
+          ...prev,
+          resume: 'File size must be less than 5MB'
+        }));
+        return;
+      }
+      
+      // Check file type
+      const validTypes = ['application/pdf', 'application/msword', 
+                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!validTypes.includes(file.type)) {
+        setFormErrors(prev => ({
+          ...prev,
+          resume: 'Only PDF and Word documents are allowed'
+        }));
+        return;
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        resume: file
+      }));
+      
+      // Clear error
+      if (formErrors.resume) {
+        setFormErrors(prev => ({
+          ...prev,
+          resume: ''
+        }));
+      }
+    }
+  };
+
   const validateForm = () => {
     const errors = {};
     
@@ -71,80 +101,66 @@ const Careers = () => {
     return Object.keys(errors).length === 0;
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!validateForm()) {
-    return;
-  }
-  
-  setIsSubmitting(true);
-  setSubmitStatus(null);
-  
-  try {
-    // Create FormData object to send file
-    const formDataToSend = new FormData();
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('phone', formData.phone);
-    formDataToSend.append('position', formData.position);
-    formDataToSend.append('experience', formData.experience);
-    formDataToSend.append('message', formData.message || '');
-    formDataToSend.append('resume', formData.resume);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    // Send to your backend API
-    const response = await fetch('http://localhost:5000/api/careers/apply', {
-      method: 'POST',
-      body: formDataToSend
-    });
-    
-    // Check if response is OK
-    if (!response.ok) {
-      throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+    if (!validateForm()) {
+      return;
     }
     
-    // Try to parse JSON response
-    let result;
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    
     try {
-      result = await response.json();
-    } catch (parseError) {
-      throw new Error('Invalid response from server');
-    }
-    
-    if (result.success) {
-      setSubmitStatus('success');
+      // Create FormData object to send file
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('position', formData.position);
+      formDataToSend.append('experience', formData.experience);
+      formDataToSend.append('message', formData.message || '');
+      formDataToSend.append('resume', formData.resume);
       
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        position: '',
-        experience: '',
-        message: '',
-        resume: null
-      });
+      // Send to your backend API - using a relative path
+      const response = await fetch("/api/career", {
+  method: "POST",
+  body: formDataToSend,
+});
       
-      // Reset file input
-      const fileInput = document.getElementById('resume');
-      if (fileInput) fileInput.value = '';
-    } else {
-      throw new Error(result.message || 'Failed to submit application');
-    }
-  } catch (error) {
-    console.error('Error submitting form:', error);
-    
-    // Specific error message for connection issues
-    if (error.message.includes('Failed to fetch') || error.message.includes('Connection refused')) {
-      setSubmitStatus('connection-error');
-    } else {
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setSubmitStatus('success');
+        
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          position: '',
+          experience: '',
+          message: '',
+          resume: null
+        });
+        
+        // Reset file input
+        const fileInput = document.getElementById('resume');
+        if (fileInput) fileInput.value = '';
+      } else {
+        throw new Error(result.message || 'Failed to submit application');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
       setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
- 
+  };
 
   // Animation variants
   const fadeIn = {
@@ -157,13 +173,6 @@ const handleSubmit = async (e) => {
       transition: {
         staggerChildren: 0.1
       }
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFileName(file.name);
     }
   };
 
@@ -182,14 +191,11 @@ const handleSubmit = async (e) => {
             alt="Ario Shipping Careers"
             fill
             priority
-    
             className="hero-image"
           /> 
         </div>
         
         <div className="hero-content px-6 py-12 md:py-24">
-           
-           
         </div>
       </motion.section>
 
@@ -215,7 +221,6 @@ const handleSubmit = async (e) => {
             >
               As a fast-growing name in global shipping and logistics, we're looking for passionate, innovative individuals ready to take on challenges and grow with us.
             </motion.p>
-            
           </div>
         </div>
       </motion.section>
@@ -239,75 +244,55 @@ const handleSubmit = async (e) => {
           </div>
 
           <div className="tab-content bg-white rounded-xl shadow-md p-8">
-  {activeTab === 'why-ario' && (
-    <motion.div 
-      className="why-ario-content grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-      initial="hidden"
-      animate="visible"
-      variants={staggerContainer}
-    >
-      {/* First three cards in normal positions */}
-      {[
-        {
-          icon: <FaChartLine className="icon" />,
-          title: "Professional Growth",
-          desc: "Gain hands-on experience with global logistics operations, cross-border trade solutions, and client management that accelerates your development."
-        },
-        {
-          icon: <FaHandshake className="icon" />,
-          title: "Inclusive Culture",
-          desc: "Our culture of respect, collaboration, and diversity encourages every team member to share ideas and contribute meaningfully."
-        },
-        {
-          icon: <FaUserTie className="icon" />,
-          title: "Leadership & Mentorship",
-          desc: "Learn from industry leaders through strategic mentorship and knowledge-sharing that prepares you for long-term success."
-        }
-      ].map((item, index) => (
-        <motion.div 
-          key={index}
-          className="benefit-card p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-all"
-          variants={fadeIn}
-          whileHover={{ y: -5 }}
-        >
-          <div className="benefit-icon text-[#003980] text-3xl mb-4">
-            {item.icon}
-          </div>
-          <h3 className="text-xl font-semibold mb-3 text-[#003980]">{item.title}</h3>
-          <p className="text-gray-600">{item.desc}</p>
-        </motion.div>
-      ))}
-
-      {/* Last two cards - centered together */}
-     <motion.div 
-  className="grid md:grid-cols-2 gap-6 md:col-span-2 lg:col-span-3 lg:mx-auto lg:w-2/3 rounded-lg overflow-hidden"
->
-  {/* Card 1 - Global */}
-  <motion.div
-    className="benefit-card p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-all"
-    variants={fadeIn}
-    whileHover={{ y: -5 }}
-   
-  >
-    <FaGlobe className="icon text-[#003980] text-3xl mb-4" />
-    <h3 className="text-xl font-semibold mb-3 text-[#003980]">Global Footprint</h3>
-    <p className="text-gray-600">With operations across India and upcoming global expansions...</p>
-  </motion.div>
-
-  {/* Card 2 - Employee */}
-  <motion.div
-    className="benefit-card p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-all"
-    variants={fadeIn}
-    whileHover={{ y: -5 }}
- 
-  >
-    <FaHeart className="icon text-[#003980] text-3xl mb-4" />
-    <h3 className="text-xl font-semibold mb-3 text-[#003980]">Employee-Centric</h3>
-    <p className="text-gray-600">Competitive compensation, performance rewards...</p>
-  </motion.div>
-</motion.div>
-    </motion.div>
-  )}
+            {activeTab === 'why-ario' && (
+              <motion.div 
+                className="why-ario-content grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+              >
+                {[
+                  {
+                    icon: <FaChartLine className="icon" />,
+                    title: "Professional Growth",
+                    desc: "Gain hands-on experience with global logistics operations, cross-border trade solutions, and client management that accelerates your development."
+                  },
+                  {
+                    icon: <FaHandshake className="icon" />,
+                    title: "Inclusive Culture",
+                    desc: "Our culture of respect, collaboration, and diversity encourages every team member to share ideas and contribute meaningfully."
+                  },
+                  {
+                    icon: <FaUserTie className="icon" />,
+                    title: "Leadership & Mentorship",
+                    desc: "Learn from industry leaders through strategic mentorship and knowledge-sharing that prepares you for long-term success."
+                  },
+                  {
+                    icon: <FaGlobe className="icon" />,
+                    title: "Global Footprint",
+                    desc: "With operations across India and upcoming global expansions, work on international projects and expand your horizons."
+                  },
+                  {
+                    icon: <FaHeart className="icon" />,
+                    title: "Employee-Centric",
+                    desc: "Competitive compensation, performance rewards, and a supportive environment that values work-life balance."
+                  }
+                ].map((item, index) => (
+                  <motion.div 
+                    key={index}
+                    className="benefit-card p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-all"
+                    variants={fadeIn}
+                    whileHover={{ y: -5 }}
+                  >
+                    <div className="benefit-icon text-[#003980] text-3xl mb-4">
+                      {item.icon}
+                    </div>
+                    <h3 className="text-xl font-semibold mb-3 text-[#003980]">{item.title}</h3>
+                    <p className="text-gray-600">{item.desc}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
 
             {activeTab === 'apply-now' && (
               <motion.div 
@@ -339,6 +324,7 @@ const handleSubmit = async (e) => {
                   onSubmit={handleSubmit}
                   variants={fadeIn}
                   className="max-w-3xl mx-auto"
+                  encType="multipart/form-data"
                 >
                   <div className="form-grid grid md:grid-cols-2 gap-6 mb-8">
                     <div className="form-group">
@@ -424,6 +410,19 @@ const handleSubmit = async (e) => {
                         placeholder="Years of relevant experience"
                       />
                       {formErrors.experience && <p className="text-red-500 text-sm mt-1">{formErrors.experience}</p>}
+                    </div>
+                    
+                    <div className="form-group md:col-span-2">
+                      <label htmlFor="message" className="block text-gray-700 mb-2 font-medium">Message (Optional)</label>
+                      <textarea 
+                        id="message" 
+                        name="message" 
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        rows="4"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Tell us why you're interested in joining Ario Shipping..."
+                      />
                     </div>
                     
                     <div className="form-group file-upload md:col-span-2 relative">
